@@ -86,3 +86,6 @@ class ImportFootage(HookBaseClass):
         if sequence_range and sequence_range[0] != sequence_range[1]:
             import_options.sequence = True
             import_options.forceAlphabetical = True
+            import_options.rangeStart = 1001
+
+        return import_options

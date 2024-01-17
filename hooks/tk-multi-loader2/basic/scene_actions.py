@@ -29,7 +29,6 @@ _ADD_TO_PROJECT = "add_to_project"
 
 
 class AfterEffectsActions(HookBaseClass):
-
     ##############################################################################################################
     # public interface - to be overridden by deriving classes
 
