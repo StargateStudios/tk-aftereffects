@@ -176,10 +176,13 @@ class AfterEffectsLauncher(SoftwareLauncher):
         # of an Adobe host application. We're appending instead of setting because
         # we don't want to stomp on any PYTHONPATH that might already exist that
         # we want to persist when the Python subprocess is spawned.
-        sgtk.util.append_path_to_env_var(
-            "PYTHONPATH",
-            os.pathsep.join(sys.path),
-        )
+
+        # Commenting this as it was breaking renders on the farm. 17/01/2024
+        # sgtk.util.append_path_to_env_var(
+        #     "PYTHONPATH",
+        #     os.pathsep.join(sys.path),
+        # )
+
         env["PYTHONPATH"] = os.environ["PYTHONPATH"]
 
         return env

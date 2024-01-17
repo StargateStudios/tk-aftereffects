@@ -329,14 +329,12 @@ class AfterEffectsEngine(sgtk.platform.Engine):
             return {"name": "AfterFX", "version": "unknown"}
 
         version = self.adobe.app.version
+        major = version.split(".")[0]
         # app.aftereffects.AfterEffectsVersion just returns 18.1.1 which is not what users see in the UI
         # extract a more meaningful version from the systemInformation property
         # which gives something like:
         # Adobe After Effects Version: 2017.1.1 20170425.r.252 2017/04/25:23:00:00 CL 1113967  x64\rNumber of .....
         # and use it instead if available.
-        regex = re.compile(r"(\d+\.?\d*)")
-        match = regex.search(six.ensure_str(version))
-        major = int(float(match[0]))
         cc_version = self.__CC_VERSION_MAPPING.get(major, version)
         return {
             "name": "AfterFX",
@@ -370,7 +368,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
         """
 
         with self.context_changes_disabled():
-
             if path is None:
                 self.adobe.app.project.save()
             else:
@@ -555,7 +552,7 @@ class AfterEffectsEngine(sgtk.platform.Engine):
         import_options.file = file_obj
         import_options.sequence = False
 
-        self.execute_hook_method(
+        import_options = self.execute_hook_method(
             "import_footage_hook", "set_import_options", import_options=import_options
         )
 
@@ -713,6 +710,9 @@ class AfterEffectsEngine(sgtk.platform.Engine):
         frames = [int(re.search(frame_pattern, f).group(2)) for f in file_roots]
         return (min(frames), max(frames))
 
+    def get_version(self):
+        return self.adobe.app.version
+
     ############################################################################
     # RPC
 
@@ -795,7 +795,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
         # If the _adobe attribute is set, then we can forward logging calls
         # back to the js process via rpc.
         if hasattr(self, "_adobe"):
-
             level = self.PY_TO_JS_LOG_LEVEL_MAPPING[record.levelname]
 
             # log the message back to js via rpc
@@ -804,7 +803,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
         # prior to the _adobe attribute being set, we rely on the js process
         # handling stdout and logging it.
         else:
-
             # we don't use the handler's format method here because the adobe
             # side expects a certain format.
             msg_str = "[%s]: %s" % (record.levelname, record.message)
@@ -1158,7 +1156,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
             TODO: Implement an equivalent method on mac
         """
         if sgtk.util.is_windows():
-
             # to get all dialogs from After Effects, we have to query the
             # After Effects process id first. As this code runs inside a
             # separate python process, we use a subprocess for this.
@@ -1225,7 +1222,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
             # in case there are open dialogs, but we already raised them,
             # we do nothing.
             if all_hwnds:
-
                 return
             # In case there is no open dialog, we will reset the cache to None
             self._POPUP_CACHE = None
@@ -1563,8 +1559,7 @@ class AfterEffectsEngine(sgtk.platform.Engine):
 
         # iterate over all the registered commands and gather the necessary info
         # to display them in adobe
-        for (command_name, command_info) in self.commands.items():
-
+        for command_name, command_info in self.commands.items():
             # commands come with a dict of properties that may or may not
             # contain certain data.
             properties = command_info.get("properties", {})
@@ -1576,7 +1571,7 @@ class AfterEffectsEngine(sgtk.platform.Engine):
 
             # check this command's app against the engine's apps.
             if app_instance:
-                for (app_instance_name, app_instance_obj) in self.apps.items():
+                for app_instance_name, app_instance_obj in self.apps.items():
                     if app_instance_obj == app_instance:
                         app_name = app_instance_name
 
@@ -1623,7 +1618,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
         )
 
         if self.context.filesystem_locations:
-
             # the icon to use for the command. bundled with the engine
             fs_icon = os.path.join(
                 self.disk_location, "resources", "shotgun_folder.png"
@@ -1722,7 +1716,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
         paths = self.context.filesystem_locations
         self.logger.debug("FS paths: %s" % (str(paths),))
         for disk_location in paths:
-
             # run the app
             if sgtk.util.is_macos():
                 cmd = 'open "%s"' % disk_location
@@ -1828,7 +1821,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
 
         # log a message if the worker failed to retrieve the necessary info.
         if uid == self.__context_find_uid:
-
             # clear the find id since we are now processing it
             self.__context_find_uid = None
 
@@ -1847,7 +1839,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
             self.logger.error("Failed to query context fields: %s" % (msg,))
 
         elif uid == self.__context_thumb_uid:
-
             # clear the thumb id since we are now processing it
             self.__context_thumb_uid = None
 
@@ -1864,7 +1855,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
 
         # the find query for the context entity with the specified fields
         if uid == self.__context_find_uid:
-
             # clear the find id since we are now processing it
             self.__context_find_uid = None
 
@@ -1910,7 +1900,6 @@ class AfterEffectsEngine(sgtk.platform.Engine):
 
         # thumbnail download. forward the path and a url back to js
         elif uid == self.__context_thumb_uid:
-
             # clear the thumb id since we already processed it
             self.__context_thumb_uid = None
 
