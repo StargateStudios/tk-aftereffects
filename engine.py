@@ -1996,9 +1996,12 @@ class AfterEffectsEngine(sgtk.platform.Engine):
         # do the import
         self.adobe.app.project.importFile(import_options)
 
+        image_sequence_name = os.path.basename(import_options.file.fsName).split(".")
+
         new_items = []
         for item in self.iter_collection(self.adobe.app.project.rootFolder.items):
             if item not in item_cache:
+                item.name = image_sequence_name
                 new_items.append(item)
 
         return new_items
